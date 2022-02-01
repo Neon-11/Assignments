@@ -48,14 +48,8 @@ class costing:
     # Prediction based on trained model
     # Use sigmoid function to calculate probability rounded off to either 0 or 1
   def predict(self,w,X):
-    h = costing().sigmoid(X@w)
-    p = np.zeros(len(h))            # 'p' should be a vector of size equal to that of vector 'y'
-    for i in range(len(h)):
-      if h[i] < 0.5:
-        p[i] = 0
-      else:
-        p[i] = 1  
-    return p
+    p = costing().sigmoid(X@w)
+    return np.round(p)
   
     # Optimization defintion
   def minCostFun(self, w_ini, X_train, y_train, iters):
