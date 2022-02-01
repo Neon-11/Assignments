@@ -1,3 +1,4 @@
+# Commented out IPython magic to ensure Python compatibility.
 import numpy as np
 from scipy import optimize
 import pandas as pd
@@ -19,7 +20,7 @@ class lr:
         df = data.drop([f[i] for i in l2],axis = 1)
         df = df.fillna(df.mean())
         df = (df-df.min())/(df.max()-df.min())
-        X = df           
+        X = np.array(df)            # X (Feature matrix) - should be numpy array
         mean = df['MaxTemp'].mean() # Mean of a the normalized "MaxTemp" column rounded off to 3 decimal places
     
         return X, y, mean
@@ -39,9 +40,9 @@ class costing:
     w0 = w.copy()
     w0[0] = 0
     t1 = y.transpose()@np.log(h) + (1-y).transpose()@np.log(1-h)
-    t2 = (w0.transpose()@w0)/2
-    J = (t2 - t1)/m                                         # Cost 'J' should be a scalar
-    grad = (1/m)*(X.transpose()@(h-y) + lambda_*w0)         # Gradient 'grad' should be a vector
+    t2 = (w0.transpose()@w0)
+    J = (t2 - 2*t1)/(2*m)                               # Cost 'J' should be a scalar
+    grad = (X.transpose()@(h-y) + lambda_*w0)/m         # Gradient 'grad' should be a vector
     return J, grad
 
     # Prediction based on trained model
@@ -64,14 +65,19 @@ class costing:
 
     def f(w):
       return costing().costFunctionReg(w,X_train,y_train,iters)[0]
+    
+    li = []
+    i = 1
+    def callbackF(xi):
+      global i
+      li.append(f(xi))
 
-    res = optimize.minimize(f,w_ini, method = 'TNC',options = {'maxiter' : iters})
-        
+    res = optimize.minimize(f,w_ini, method = 'TNC',callback = callbackF,options = {'maxiter' : iters})
     w_opt = res.x   # Optimized weights rounded off to 3 decimal places
     p = costing().predict(w_opt,X_train)
     ones = np.ones(len(p))
-    e = ones.transpose()@abs(p-y_train)/len(X_train)
-    acrcy = (1-e)*100  # Training set accuracy (in %) rounded off to 3 decimal places    
+    e = ones.transpose()@abs(p-y_train)
+    acrcy = (len(X_train)-e)*100/(len(X_train))     # Training set accuracy (in %) rounded off to 3 decimal places    
     return w_opt, acrcy
   
     # Calculate testing accuracy
@@ -84,7 +90,7 @@ class costing:
     X_test = np.vstack([np.ones(len(X_test)),X_test.transpose()]).transpose()       # Add '1' for bias term
     p = costing().predict(w_opt,X_test)
     ones = np.ones(len(p))
-    e = ones.transpose()@abs(p-y_test)/len(X_test)
-    acrcy_test = (1-e)*100   # Testing set accuracy (in %) rounded off to 3 decimal places
+    e = ones.transpose()@abs(p-y_test)
+    acrcy_test = (len(X_test)-e)*100/(len(X_test))   # Testing set accuracy (in %) rounded off to 3 decimal places
         
-    return acrcy_test  
+    return acrcy_test   
