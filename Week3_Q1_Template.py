@@ -19,7 +19,7 @@ class lr:
         df = data.drop([f[i] for i in l2],axis = 1)
         df = df.fillna(df.mean())
         df = (df-df.min())/(df.max()-df.min())
-        X = np.array(df)            # X (Feature matrix) - should be numpy array
+        X = df           
         mean = df['MaxTemp'].mean() # Mean of a the normalized "MaxTemp" column rounded off to 3 decimal places
     
         return X, y, mean
