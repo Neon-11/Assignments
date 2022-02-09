@@ -47,14 +47,20 @@ class costing:
     X_train,y_train = self.data_clean(train_data)
     X = np.vstack([np.ones(np.shape(X_train)[0]),X_train.T]).T    # Add '1' for bias term
     w = np.array([])
+    li = [[] for i in range(10)]
     for k in range(10):
       y = np.array(y_train == k).astype(int)
       wk = np.zeros(785)
-      res = optimize.minimize(self.costFunctionReg,wk,(X,y,lambda_),method = 'CG',jac = True,options = {'maxiter' :iters})
+      i = 1
+      def callbackF(xi):
+        global i
+        li[k].append(self.costFunctionReg(xi,X,y,lambda_)[0])
+      res = optimize.minimize(self.costFunctionReg,wk,(X,y,lambda_),method = 'CG',jac = True,callback = callbackF,options = {'maxiter' :iters})
       if k == 0:
         w = np.vstack([res.x])
       else:
         w = np.vstack([w,res.x])
+        
     global all_w
     all_w = w                                   # Optimized weights (size = 10 X 785) rounded off to 3 decimal places
     p = self.predictOneVsAll(all_w,X,10)
