@@ -90,7 +90,7 @@ def plot_stiffness_bar(x, EA, EA_analytic=None):
     ax.set_ylabel("EA")
 
     # Plot data
-    ax.plot(x.detach().numpy(), EA.detach().numpy(),color='r', label="EA_pred")
+    ax.plot(x.detach().numpy(), EA.detach().numpy(),color='b', label="EA_pred")
     if EA_analytic != None:
         ax.plot(x.detach().numpy(), EA_analytic(x.detach().numpy()), label="EA_analytic")
 
