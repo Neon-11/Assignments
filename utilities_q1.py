@@ -73,7 +73,7 @@ def plot_displacements_bar(x, u, u_analytic=None):
 
     # Plot data
     if u_analytic != None:
-        ax.plot(x.detach().numpy(), u_analytic(x.detach().numpy()),color='r', linewidth=2, label="u_analytic")
+        ax.plot(x.detach().numpy(), u_analytic(x.detach().numpy()),color='b', linewidth=2, label="u_analytic")
     ax.plot(x.detach().numpy(), u.detach().numpy(),color='k',linestyle=':',linewidth=5, label="u_pred")
 
     ax.legend()
