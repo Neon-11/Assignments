@@ -49,4 +49,5 @@ int main(int argc, char **argv)
     Set::Scalar detD = D.determinant();
     std::cout << "The determinant of D = \n" << detD << std::endl;
 
+    return 0;
 }
