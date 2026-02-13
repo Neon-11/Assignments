@@ -1,0 +1,109 @@
+import sympy as sp
+import numpy as np
+import matplotlib.pyplot as plt
+
+# -------------------------------------------------
+# Symbolic variable
+# -------------------------------------------------
+x = sp.symbols('x', real=True)
+
+# -------------------------------------------------
+# Inner product on C[0,1]
+# <u,v> = ∫_0^1 x u(x) v(x) dx
+# -------------------------------------------------
+def inner_product(u, v):
+    return sp.integrate(x * u * v, (x, 0.0, 1.0))
+
+# -------------------------------------------------
+# Raw polynomial basis (finite-dimensional subspace)
+# -------------------------------------------------
+raw_basis = [1.0, x, x**2.0, x**3.0]
+
+# -------------------------------------------------
+# Gram–Schmidt orthonormalization
+# -------------------------------------------------
+orthonormal_basis = []
+
+for v in raw_basis:
+    w = v
+    for phi in orthonormal_basis:
+        w -= inner_product(v, phi) * phi
+    norm = sp.sqrt(inner_product(w, w))
+    phi_new = sp.simplify(w / norm)
+    orthonormal_basis.append(phi_new)
+
+# -------------------------------------------------
+# Print orthonormal basis
+# -------------------------------------------------
+print("Orthonormal basis on C[0,1] (polynomial subspace):\n")
+for i, phi in enumerate(orthonormal_basis):
+    print(f"phi_{i}(x) =")
+    sp.pprint(phi)
+    print()
+
+# -------------------------------------------------
+# Functions to project
+# -------------------------------------------------
+f_sin = sp.sin(sp.pi * x)
+f_cos = sp.cos(sp.pi * x)
+
+# -------------------------------------------------
+# Projection coefficients
+# -------------------------------------------------
+coeffs_sin = [sp.simplify(inner_product(f_sin, phi)) for phi in orthonormal_basis]
+coeffs_cos = [sp.simplify(inner_product(f_cos, phi)) for phi in orthonormal_basis]
+
+print("Projection coefficients for sin(pi x):")
+for i, c in enumerate(coeffs_sin):
+    print(f"c_{i} =", c)
+
+print("\nProjection coefficients for cos(pi x):")
+for i, c in enumerate(coeffs_cos):
+    print(f"c_{i} =", c)
+
+# -------------------------------------------------
+# Symbolic projections
+# -------------------------------------------------
+sin_proj = sp.simplify(sum(coeffs_sin[i] * orthonormal_basis[i] for i in range(4)))
+cos_proj = sp.simplify(sum(coeffs_cos[i] * orthonormal_basis[i] for i in range(4)))
+
+print("\nProjection of sin(pi x):")
+sp.pprint(sin_proj)
+
+print("\nProjection of cos(pi x):")
+sp.pprint(cos_proj)
+
+# -------------------------------------------------
+# Convert to numerical functions for plotting
+# -------------------------------------------------
+sin_exact = sp.lambdify(x, f_sin, "numpy")
+cos_exact = sp.lambdify(x, f_cos, "numpy")
+sin_proj_num = sp.lambdify(x, sin_proj, "numpy")
+cos_proj_num = sp.lambdify(x, cos_proj, "numpy")
+
+# -------------------------------------------------
+# Plot and save
+# -------------------------------------------------
+x_plot = np.linspace(0, 1, 600)
+
+plt.figure(figsize=(10,4))
+
+plt.subplot(1,2,1)
+plt.plot(x_plot, sin_exact(x_plot), label=r"$\sin(\pi x)$", linewidth=2)
+plt.plot(x_plot, sin_proj_num(x_plot), "--", label="Projection")
+plt.title("Projection of sin(pi x)")
+plt.xlabel("x")
+plt.legend()
+plt.grid(True)
+
+plt.subplot(1,2,2)
+plt.plot(x_plot, cos_exact(x_plot), label=r"$\cos(\pi x)$", linewidth=2)
+plt.plot(x_plot, cos_proj_num(x_plot), "--", label="Projection")
+plt.title("Projection of cos(pi x)")
+plt.xlabel("x")
+plt.legend()
+plt.grid(True)
+
+plt.tight_layout()
+plt.savefig("part_c_weighted_projection.pdf", dpi=300)
+plt.show()
