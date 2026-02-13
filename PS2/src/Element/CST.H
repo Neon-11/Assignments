@@ -59,7 +59,10 @@ public:
 
         std::array<double,3> ret; // <-- store the return values in this variable
 
-        // ** your code goes here ** 
+        // ** your code goes here **
+	ret[0] = 1.0 - Y[0] - Y[1];
+	ret[1] = Y[0];
+	ret[2] = Y[1];
 
         return ret;               // <-- they are returned here
     }
@@ -83,6 +86,9 @@ public:
         std::array<Set::Vector,3> ret; // <-- store the return values here
 
         // ** your code goes here **
+	ret[0] = {-1, -1};
+	ret[1] = {1, 0};
+	ret[2] = {0, 1};
 
         return ret;
     }
